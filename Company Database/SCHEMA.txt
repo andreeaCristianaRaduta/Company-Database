@@ -1,0 +1,439 @@
+﻿
+--------------------------CREATE BRAND TABLE
+CREATE TABLE RAC_BRAND(
+brand_id NUMBER(2)
+CONSTRAINT PK_BRAND_ID PRIMARY KEY,
+code VARCHAR2(5) NOT NULL,
+description VARCHAR2(50)
+);
+
+--------------------------CREATE CATEGORY TABLE
+CREATE TABLE RAC_CATEGORY(
+category_id NUMBER(2) 
+CONSTRAINT PK_CATEGORY_ID PRIMARY KEY,
+code NUMBER(3) NOT NULL,
+description VARCHAR2(50) NOT NULL
+);
+
+--------------------------CREATE STATUS TABLE
+CREATE TABLE RAC_STATUS(
+status_id NUMBER(2) 
+CONSTRAINT PK_STATUS_ID PRIMARY KEY,
+code NUMBER(1) NOT NULL,
+description VARCHAR2(20) NOT NULL
+);
+
+--------------------------CREATE TABLE PRODUCT
+CREATE TABLE RAC_PRODUCT(
+product_id NUMBER(2)
+CONSTRAINT PK_PRODUCT_ID PRIMARY KEY,
+code NUMBER(10),
+description VARCHAR2(100),
+brand_id NUMBER(2) 
+CONSTRAINT FK_BRAND REFERENCES RAC_BRAND(brand_id),
+category_id NUMBER(2) 
+CONSTRAINT FK_CATEGORY REFERENCES RAC_CATEGORY(category_id),
+status_id NUMBER(2) 
+CONSTRAINT FK_STATUS REFERENCES RAC_STATUS(status_id)
+);
+
+--------------------------CREATE TABLE SELLER
+CREATE TABLE RAC_SELLER(
+seller_id NUMBER(2)
+CONSTRAINT PK_SELLER_ID PRIMARY KEY,
+seller_name VARCHAR2(50) NOT NULL
+);
+
+--------------------------CREATE TABLE CONTRACT
+CREATE TABLE RAC_CONTRACT(
+contract_number NUMBER(10)
+CONSTRAINT PK_CONTRACT_ID PRIMARY KEY,
+start_date DATE NOT NULL,
+end_date DATE NOT NULL,
+seller_id NUMBER(2)
+CONSTRAINT FK_SELLER REFERENCES RAC_SELLER(seller_id)
+);
+
+
+--------------------------CREATE TABLE TRANSACTION
+CREATE TABLE RAC_TRANSACTION(
+product_id NUMBER(2)
+CONSTRAINT FK_PRODUCT REFERENCES RAC_PRODUCT(product_id),
+contract_number NUMBER(10)
+CONSTRAINT FK_CONTRACT REFERENCES RAC_CONTRACT(contract_number),
+quantity NUMBER(5),
+price NUMBER(7,2)
+);
+ALTER TABLE RAC_TRANSACTION
+ADD CONSTRAINT PK_TRANSACTION PRIMARY KEY(product_id,contract_number);
+
+--------------------------CREATE TABLE CURRENCY
+CREATE TABLE RAC_CURRENCY(
+currency_id NUMBER(2)
+CONSTRAINT PK_CURRENCY_ID PRIMARY KEY,
+code VARCHAR2(5) NOT NULL,
+description VARCHAR2(10) NOT NULL
+);
+
+--------------------------CREATE TABLE COUNTRY
+CREATE TABLE RAC_COUNTRY(
+country_id NUMBER(2)
+CONSTRAINT PK_COUNTRY_ID PRIMARY KEY,
+code VARCHAR2(5) NOT NULL,
+description VARCHAR(50) NOT NULL,
+country_language VARCHAR2(15) NOT NULL,
+currency_id NUMBER(2)
+CONSTRAINT FK_CURRENCY REFERENCES RAC_CURRENCY(currency_id)
+);
+
+--------------------------CREATE TABLE SOTRE_TYPE
+CREATE TABLE RAC_STORE_TYPE(
+store_type_id NUMBER(2)
+CONSTRAINT PK_STORE_TYPE_ID PRIMARY KEY ,
+description VARCHAR2(20) NOT NULL,
+capacity NUMBER(10)
+);
+
+--------------------------CREATE TABLE STORE
+CREATE TABLE RAC_STORE(
+store_id NUMBER(2)
+CONSTRAINT PK_STORE_ID PRIMARY KEY,
+code VARCHAR2(10) NOT NULL ,
+store_name VARCHAR2(50) NOT NULL,
+country_id NUMBER(2)
+CONSTRAINT FK_COUNTRY REFERENCES RAC_COUNTRY(country_id),
+store_type_id NUMBER(2)
+CONSTRAINT FK_STORE_TYPE_ID REFERENCES RAC_STORE_TYPE(store_type_id)
+);
+--------------------------CREATE TABLE SALE
+CREATE TABLE RAC_SALE(
+product_id NUMBER(2)
+CONSTRAINT FK_PRODUCT_ID REFERENCES RAC_PRODUCT(product_id),
+store_id NUMBER(2)
+CONSTRAINT FK_STORE REFERENCES RAC_STORE(store_id),
+sale_date DATE,
+quantity NUMBER(5)
+);
+
+
+ALTER TABLE RAC_SALE
+ADD CONSTRAINT PK_SALE PRIMARY KEY (product_id,store_id);
+
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~POPULAREA TABELELOR
+
+-----------------------------BRAND
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(1,'CD','Christian Dior SRL');
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(2,'CHBV','Chanel International B.V.');
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(3,'MK','Milka');
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(4,'CLS','Chocoladefabriken Lindt and Sprüngli AG');
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(5,'PM','Philip Morris USA'); --marlboro
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(6,'RTC','R.J. Reynolds Tobacco Company'); --lucky Strike & Camel &Peter Stuyvesant
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(7,'FG','Fossil Group, Inc.');
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(8,'CD','Jacobs Douwe Egberts');
+INSERT INTO RAC_BRAND(id_brand,code, description)
+VALUES(9,'TAG',' Tchibo (Schweiz) AG');
+
+
+-------------------------------CATEGORY
+INSERT INTO RAC_CATEGORY(category_id,code,description)
+VALUES(1,30,'Parfumes and Cosmetics');
+INSERT INTO RAC_CATEGORY(category_id,code,description)
+VALUES(2,50,'Food');
+INSERT INTO RAC_CATEGORY(category_id,code,description)
+VALUES(3,10,'Tobacco');
+INSERT INTO RAC_CATEGORY(category_id,code,description)
+VALUES(4,60,'Accessories');
+
+
+-------------------------------STATUS
+INSERT INTO RAC_STATUS(status_id,code,description)
+VALUES(1,0,'Not available');
+INSERT INTO RAC_STATUS(status_id,code,description)
+VALUES(2,1,'Available');
+
+--------------------------------PRODUCT
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(1,100001, 'J''adore Dior',1, 1, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(2,100002, 'Miss Dior',1, 1, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(3,100003, 'Capture Total, Super Potent Serum',1, 1, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(4,200001, 'Ciocolata cu lapte alpin 100g Milka',3, 2, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(5,200002, 'Ciocolata alba 100g Milka',3, 2, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(6,200003, 'Drajeuri de ciocolata cu lapte Bonibon 24.3g',3, 2, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(7,200004, 'EXCELLENCE Lime Intense',4, 2, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(8,200005, 'EXCELLENCE Cocoa 99%',4, 2, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(9,200006, 'LINDOR Mango and Cream Bag 123g',4, 2, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(10,200007, 'Lindor Raspberry Friendship Heart 60g',4, 2, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(11,300001, 'Tigari Touch XL 7mg Marlboro',5, 3, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(12,300002, 'Tigari Classic 100''S Marlboro',5, 3, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(13,300003, 'Tigari Filter Plus Marlboro',5, 3, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(14,300004, 'Lucky Strike Cigarettes Green',6, 3, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(15,300005, 'Lucky Strike Cigarettes Red',6, 3, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(16,300006, 'Herbal Cigarettes Filtered Variety Pack',6, 3, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(17,300007, 'Tesla Coil Lighters™ USB Rechargeable Windproof',6, 3, 2); 
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(18,300008, 'Camel Cigarettes Pleasure to Burn',6, 3, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(19,400001, 'Ceas de dama Fossil Jacqueline ES3433',7, 4, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(20,400002, 'Fossil, Ceas cu o curea ingusta de piele Georgia',7, 4, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(21,400003, 'Fossil, Set de ceas si bijuterii decorate cu cristale, Auriu rose',7, 4, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(22,500001, 'Logan RFID Tab Clutch',7, 4, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(23,500002, 'Jacobs Kronung Ground Coffee 17.6oz/500g',8, 2, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(24,500003, 'Jacobs Instant Cappuccino 14.1oz/400g',8, 2, 1);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(25,500004, 'Jacobs Espresso Whole Bean Coffee 2.2lbs/1kg',8, 2, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(26,500005, 'Tchibo Exclusive Decaf',9, 2, 2);
+INSERT INTO RAC_PRODUCT(product_id,code, description,brand_id, category_id, status_id)
+VALUES(27,500006, 'Espresso Sicilia Style',9, 2, 1);
+
+----------------------------------------SELLER
+INSERT INTO RAC_SELLER(seller_id,seller_name)
+VALUES(1,'Cofetaria SweeetDreams Paris');
+INSERT INTO RAC_SELLER(seller_id,seller_name)
+VALUES(2,'CosmeticsBoutique');
+INSERT INTO RAC_SELLER(seller_id,seller_name)
+VALUES(3,'Cora SRL');
+INSERT INTO RAC_SELLER(seller_id,seller_name)
+VALUES(4,'Amazon SRL');
+INSERT INTO RAC_SELLER(seller_id,seller_name)
+VALUES(5,'Cigarettes4Life');
+
+---------------------------------------CONTRACT
+INSERT INTO RAC_CONTRACT(contrat_number, start_date,end_date,seller_id)
+VALUES(20190201,TO_DATE('01-02-2019','DD-MM-YYYY'),TO_DATE('01-02-2020','DD-MM-YYYY'),2);
+INSERT INTO RAC_CONTRACT(contract_number, start_date,end_date,seller_id)
+VALUES(20180316,TO_DATE('16-03-2018','DD-MM-YYYY'),TO_DATE('16-09-2018','DD-MM-YYYY');,3);
+INSERT INTO RAC_CONTRACT(contract_number, start_date,end_date,seller_id)
+VALUES(20160610,TO_DATE('10-06-2016','DD-MM-YYYY'),TO_DATE('10-06-2019','DD-MM-YYYY'),4);
+INSERT INTO RAC_CONTRACT(contract_number, start_date,end_date,seller_id)
+VALUES(20140423,TO_DATE('23-04-2014','DD-MM-YYYY'),TO_DATE('23-04-2016','DD-MM-YYYY'),1);
+INSERT INTO RAC_CONTRACT(contract_number, start_date,end_date,seller_id)
+VALUES(20160930,TO_DATE('30-09-2016','DD-MM-YYYY'),TO_DATE('30-09-2020','DD-MM-YYYY'),1);
+INSERT INTO RAC_CONTRACT(contract_number, start_date,end_date,seller_id)
+VALUES(20191106,TO_DATE('06-11-2019','DD-MM-YYYY'),TO_DATE('06-05-2020','DD-MM-YYYY'),3);
+INSERT INTO RAC_CONTRACT(contract_number, start_date,end_date,seller_id)
+VALUES(20160201,TO_DATE('01-02-2016','DD-MM-YYYY'),TO_DATE('01-02-2017','DD-MM-YYYY'),1);
+
+---------------------------------------TRANSACTION
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(1,20190201,30,160);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(2,20190201,44,20000);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(3,20190201,60,2369.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(4,20180316,300,1600);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(5,20180316,265,250);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(6,20180316,416,199.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(7,20160610,500,3324);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(8,20160610,200,1432);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(9,20160610,305,1600);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(10,20160610,630,2340);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(11,20140423,100,340);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(12,20140423,500,269.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(13,20140423,350,299.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(14,20160930,30,160);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(15,20160930,30,160);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(16,20160930,30,160);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(17,20160930,30,160);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(18,20160930,240,1060);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(19,20191106,50,1400);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(20,20191106,75,1999.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(21,20191106,30,2199.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(22,20191106,38,1699.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(23,20160201,30,160);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(24,20160201,200,244.55);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(25,20160201,160,195.55);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(26,20333551,150,269.99);
+INSERT INTO RAC_TRANSACTION(product_id, contract_number, quantity, price)
+VALUES(27,20333551,300,1690);
+
+---------------------------------CURRENCY
+INSERT INTO RAC_CURRENCY(currency_id, code, description)
+VALUES(1,'EUR','euro');
+INSERT INTO RAC_CURRENCY(currency_id, code, description)
+VALUES(2,'RON','lei');
+INSERT INTO RAC_CURRENCY(currency_id, code, description)
+VALUES(3,'BGN','leva');
+INSERT INTO RAC_CURRENCY(currency_id, code, description)
+VALUES(4,'GBP','lira');
+INSERT INTO RAC_CURRENCY(currency_id, code, description)
+VALUES(5,'USD','dollar');
+
+--------------------------------COUNTRY
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(8, 'US','United States','English',5);
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(2, 'GB','Great Britan','English',4);
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(3, 'BG','Bulgary','Bulgarian',3);
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(4, 'RO','Romania','Romanian',2);
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(5, 'FR','France','French',1);
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(6, 'GR','Greece','Greece',1);
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(7, 'IT','Italia','Italian',1);
+INSERT INTO RAC_COUNTRY(country_id, code, description, country_language,currency_id)
+VALUES(1, 'D','Deutschland','Deutsch',1);
+
+
+------------------------------STORE_TYPE
+INSERT INTO RAC_STORE_TYPE(store_type_id,description,capacity)
+VALUES(1,'minimarket',10000);
+INSERT INTO RAC_STORE_TYPE(store_type_id,description,capacity)
+VALUES(2,'supermarket',100000);
+INSERT INTO RAC_STORE_TYPE(store_type_id,description,capacity)
+VALUES(3,'hipermarket',1000000);
+
+
+-------------------------------STORE
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(1,'RX342P','SoldOut hipermarket Berlin',1,3);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(2,'PC451C','SoldOut supermarket Frankfurt',1,2);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(3,'DF021B','SoldOut minimarket Hakidiki',6,1);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(4,'CG043A','SoldOut hipermarket Thessaloiki',6,3);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(5,'JA346V','SoldOut supermarket Berlin',6,2);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(6,'TR243V','SoldOut hipermarket Paris',5,3);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(7,'YT678H','SoldOut minimarket Torino',7,1);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(8,'KL416N','SoldOut supermarket Roma',7,2);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(9,'MR358U','SoldOut minimarket Bucharest',4,1);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(10,'WE286Q','SoldOut minimarket Berlin',3,1);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(11,'OV562Z','SoldOut supermarket Liverpool',2,2);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(12,'QT471R','SoldOut hipermarket Londra',2,3);
+INSERT INTO RAC_STORE(store_id,code,store_name,country_id,store_type_id)
+VALUES(13,'GO859K','SoldOut minimarket New York',8,1);
+
+---------------------------SALEINSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(1,1,TO_DATE('20-04-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(2,1,TO_DATE('20-04-2019','DD-MM-YYYY'),30);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(3,1,TO_DATE('20-06-2019','DD-MM-YYYY'),7);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(4,2,TO_DATE('20-04-2019','DD-MM-YYYY'),5);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(5,2,TO_DATE('30-07-2019','DD-MM-YYYY'),40);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(6,2,TO_DATE('20-04-2019','DD-MM-YYYY'),60);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(7,3,TO_DATE('10-08-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(8,3,TO_DATE('23-09-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(9,4,TO_DATE('11-10-2019','DD-MM-YYYY'),30);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(10,4,TO_DATE('20-04-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(11,4,TO_DATE('15-12-2019','DD-MM-YYYY'),30);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(12,5,TO_DATE('30-04-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(13,5,TO_DATE('12-07-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(14,6,TO_DATE('29-06-2019','DD-MM-YYYY'),30);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(15,6,TO_DATE('30-05-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(16,7,TO_DATE('20-08-2019','DD-MM-YYYY'),29);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(17,7,TO_DATE('20-11-2019','DD-MM-YYYY'),11);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(18,8,TO_DATE('20-11-2019','DD-MM-YYYY'),15);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(19,9,TO_DATE('20-11-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(20,10,TO_DATE('21-04-2019','DD-MM-YYYY'),25);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(21,11,TO_DATE('06-09-2019','DD-MM-YYYY'),28);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(22,10,TO_DATE('22-06-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(23,11,TO_DATE('18-05-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(24,11,TO_DATE('20-11-2019','DD-MM-YYYY'),20);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(25,10,TO_DATE('20-04-2019','DD-MM-YYYY'),26);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(26,12,TO_DATE('20-04-2019','DD-MM-YYYY'),22);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(27,12,TO_DATE('20-04-2019','DD-MM-YYYY'),40);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(1,12,TO_DATE('20-04-2019','DD-MM-YYYY'),2);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(2,9,TO_DATE('20-04-2019','DD-MM-YYYY'),10);
+INSERT INTO RAC_SALE(product_id,store_id,sale_date,quantity)
+VALUES(3,13,TO_DATE('20-04-2019','DD-MM-YYYY'),30);
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,148 @@
+--1. Afisati date despre toate produsele de la Dior.
+SELECT p.code,p.description, b.description
+FROM RAC_PRODUCT p
+INNER JOIN RAC_BRAND b
+  USING(brand_id)
+WHERE LOWER(b.description) LIKE '%dior%';
+
+--2. Afisati numarul de produse disponibile in stoc care fac parte din categoria mancare
+SELECT COUNT(p.product_id) AS Numar_Produse, s.description,ct.description
+FROM RAC_PRODUCT p
+INNER JOIN RAC_STATUS s
+  USING(status_id)
+INNER JOIN RAC_CATEGORY ct
+  USING(category_id)
+WHERE s.code = 1
+	AND ct.description = 'Food'
+GROUP BY s.description, ct.description;
+
+--3. Afisati totalul incasarilor seller-ului Cofetaria SweeetDreams Paris 
+SELECT SUM(price) AS Total_incasari, s.seller_name
+FROM RAC_TRANSACTION t 
+INNER JOIN RAC_CONTRACT 
+  USING(contract_number)
+INNER JOIN RAC_SELLER s
+  USING(seller_id)
+WHERE seller_name = 'Cofetaria SweeetDreams Paris'
+GROUP BY s.seller_name;
+
+--4. Afisati cate produse au fost vandute la aceeasi data in Germania si magazinele in care au fost vandute
+SELECT COUNT(p.code) AS Numar_Produse, s.sale_date, st.store_name, c.description
+FROM RAC_PRODUCT p
+INNER JOIN RAC_SALE s
+  USING(product_id)
+INNER JOIN RAC_STORE st
+  USING(store_id)
+INNER JOIN RAC_COUNTRY c
+  USING(country_id)
+WHERE s.sale_date IN (
+                      SELECT sale_date
+                      FROM RAC_SALE
+                      )
+      AND c.description = 'Deutschland'
+GROUP BY s.sale_date, st.store_name, c.description;
+
+--5. Afisati valoarea tranzactiilor mai mari de 1000 la nivel de magazin facute in Grecia
+SELECT SUM(t.price) AS Total_tranzactii,st.store_name, c.description
+FROM RAC_TRANSACTION t
+INNER JOIN RAC_PRODUCT 
+  USING(product_id)
+INNER JOIN RAC_SALE
+  USING(product_id)
+INNER JOIN RAC_STORE st
+  USING(store_id)
+INNER JOIN RAC_COUNTRY c
+  USING(country_id)
+WHERE c.description = 'Greece'
+GROUP BY c.description, st.store_name
+HAVING SUM(t.price) > 1000;
+
+--6. Afisati Toate magazinele in care se vand produsele in euro in ordine alfabetica
+SELECT st.store_name, st.code, cr.description
+FROM RAC_STORE st
+INNER JOIN RAC_COUNTRY
+  USING(country_id)
+INNER JOIN RAC_CURRENCY cr
+  USING(currency_id)
+WHERE cr.code = 'EUR'
+ORDER BY st.store_name;
+
+--7. Afisati toate magazinele care nu au vandut nimic 
+SELECT st.store_name, st.code
+FROM RAC_SALE s
+FULL OUTER JOIN RAC_STORE st
+  USING(store_id)
+WHERE s.product_id IS NULL;
+
+--8. Afisati toate produsele vandute intre lunile martie si iunie
+SELECT p.code, p.description, s.sale_date
+FROM RAC_PRODUCT p
+INNER JOIN RAC_SALE s
+  USING(product_id)
+WHERE EXTRACT(MONTH FROM s.sale_date) BETWEEN '03' AND '06';
+
+--9. Pentru magazinele care au vandut mai mult de 10 produse afisati statusul vanazarii 'Target Overeached', pentru cele care au vandut fix 10 => status 'Achieved', iar pentru restul statusul va fi 'Target Not Achieved'
+SELECT p.description, p.code, st.store_name,
+CASE WHEN SUM(s.quantity) = 10
+          THEN 'Target Achieved'
+      WHEN SUM(s.quantity) > 10
+          THEN 'Target Overeached'
+      ELSE 'Target Not Achieved'
+END Sale_Status
+FROM RAC_PRODUCT p
+INNER JOIN RAC_SALE s
+  USING(product_id)
+INNER JOIN RAC_STORE st
+  USING(store_id)
+GROUP BY p.description, p.code, st.store_name;
+
+--10. Afisati produsele cu preturile tranzactiilor rotunjite
+SELECT product_id, ROUND(price)
+FROM RAC_TRANSACTION;
+
+--11. Afisati toate magazinele care se afla in Grecia sau in Marea Britanie si limba folosita
+SELECT s.code, s.store_name, c.description, c.country_language
+FROM RAC_STORE s
+INNER JOIN RAC_COUNTRY c
+  USING(country_id)
+WHERE c.description = 'Greece' OR c.description = 'Great Britan';
+
+--12. Afisati care dintre produse este comestibil sau nu
+SELECT p.code, p.description,
+  DECODE(c.code, 50, 'Comestibil','Necomestibil') Tip_Produs
+FROM RAC_PRODUCT p
+INNER JOIN RAC_CATEGORY c
+  USING(category_id);
+
+--13. Afisati toate brand-urile produselor care se vand in magazinele din tara cu codut IT
+SELECT b.code, b.description, s.store_name, c.description
+FROM RAC_BRAND b
+INNER JOIN RAC_PRODUCT
+  USING(brand_id)
+INNER JOIN RAC_SALE
+  USING(product_id)
+INNER JOIN RAC_STORE s
+  USING(store_id)
+INNER JOIN RAC_COUNTRY c
+  USING(country_id)
+WHERE c.code = 'IT';
+
+--14. Afisati produsu cu cea mai mare tranzactie facuta pe data de de 01-FEB-16
+SELECT MAX(tr.price) AS Pret_Maxim,p.description, con.start_date
+FROM RAC_TRANSACTION tr
+INNER JOIN RAC_PRODUCT p
+  USING(product_id)
+INNER JOIN RAC_CONTRACT con
+  USING(contract_number)
+WHERE con.start_date = TO_DATE('01-FEB-16')
+GROUP BY p.description, con.start_date;
+
+--15. Afisati cea mai mica cantitate de produs din magazinul SoldOut minimarket Hakidiki
+SELECT p.description, MIN(s.quantity) AS Min_Quantity, st.store_name
+FROM RAC_PRODUCT p
+INNER JOIN RAC_SALE s
+  USING(product_id)
+INNER JOIN RAC_STORE st
+  USING(store_id)
+WHERE st.store_name = 'SoldOut minimarket Hakidiki'
+GROUP BY p.description, st.store_name;
